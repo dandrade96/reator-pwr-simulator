@@ -1,60 +1,49 @@
 import time
 import random
-from sensorComporta import SensorComporta
-from atuadorComporta import AtuadorComporta
-from comporta import Comporta
-from sensorReator import SensorReator
-from atuadorReator import AtuadorReator
 from reator import Reator
+from comporta import Comporta
+from sensor import Sensor
+from atuador import Atuador
 
 class CLP:
-    def __init__(self):
+    def __init__(self, reator, comporta, sensor, atuador):
+        self.reator = reator
+        self.comporta = comporta
+        self.sensor = sensor
+        self.atuador = atuador
 
-        # Reator
-        self.reator = Reator(0)  # Temperatura inicial do reator
-        self.sensorReator = SensorReator(self.reator)
-        self.atuadorReator = AtuadorReator(self.reator)
-        # Comporta
-        self.comporta = Comporta(0)
-        self.sensorComporta = SensorComporta(self.comporta)
-        self.atuadorComporta = AtuadorComporta(self.comporta)
+    def controlar_temperatura(self, temperatura_max):
+        while True:
+            temperatura_atual = self.sensor.medir_temperatura() # medir temperatura do reator
 
-    def ligar_reator(self):
-        i = 0
-        while i < 5:
-            print('Ligando o Reator...')
-            if i == 4:
-                print('Acionando rotação...')
-            i += 1
-            time.sleep(2)
-        
-        
-    def ligar_rotacao(self):
-        self.reator.ligar_rotacao(random.uniform(10.0, 25.5))
-    
-    def medir_temperatura(self):
-        temperatura = self.sensorReator.medir_temperatura()
-        print(f"Temperatura: {temperatura}°C")
+            self.reator.rotacao(random.uniform(10.0, 25.5)) # Rotaçao do motor do reator
 
-        # Lógica de controle para ajustar a temperatura do Reator
-        if temperatura > 290:
-            self.resfriamento()
-            self.atuadorReator.ajustar_temperatura(10)
-        
+            print("Temperatura atual do reator:", temperatura_atual)
 
-    def resfriamento(self):
-        escoamento = self.sensorComporta.escoamento()
-        print(f"Escomaneto: {escoamento} Litros")
-        if escoamento < 10:
-            self.atuadorComporta.abrir_comporta(1)
-        else:
-            self.atuadorComporta.travar_comporta()
+            if temperatura_atual > temperatura_max:
+                vazao_agua = 40  # Define uma vazão menor para diminuir a temperatura
+            else:
+                vazao_agua = 0 # mantem a vazão atual
 
-clp = CLP()
-clp.ligar_reator()
-while True:
-    clp.ligar_rotacao()
-    clp.medir_temperatura()
-    clp.resfriamento()
-    time.sleep(2)
-    
+            self.reator.atualizar_temperatura(vazao_agua)
+            self.atuador.controlar_vazao(vazao_agua)
+            
+            # Aguarda um intervalo de tempo antes de verificar a temperatura novamente
+            time.sleep(1)
+            
+# Criação dos objetos dos ambientes
+volume_reator = 40  # Defina o volume do reator
+
+reator = Reator(volume=volume_reator, temperatura_inicial=0) 
+comporta = Comporta()
+sensor = Sensor(reator)
+atuador = Atuador(comporta)
+
+# Define a temperatura máxima desejada (exemplo: 325)
+# Para controle de temperatura mais preciso iniciamos uma maxima em 300 logo a temperatura não ultrapassa o nivel ideal
+temperatura_maxima = 300 
+# Criação do CLP
+clp = CLP(reator, comporta, sensor, atuador)
+
+# Inicia o controle de temperatura pelo CLP
+clp.controlar_temperatura(temperatura_maxima)

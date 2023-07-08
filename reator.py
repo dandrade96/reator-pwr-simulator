@@ -1,9 +1,13 @@
 class Reator:
-    def __init__(self, temperatura_inicial):
+    def __init__(self, volume, temperatura_inicial):
+        self.volume = volume
         self.temperatura = temperatura_inicial
 
-    def atualizar_temperatura(self, escoamento):
-        self.temperatura -= escoamento * 4.18
+    def atualizar_temperatura(self, vazao_agua):
+        self.temperatura -= vazao_agua
 
-    def ligar_rotacao(self, rotacao):
+    def obter_temperatura(self):
+        return self.temperatura
+
+    def rotacao(self, rotacao):
         self.temperatura += rotacao

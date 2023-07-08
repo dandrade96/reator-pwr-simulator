@@ -1,9 +1,6 @@
 class Comporta:
-    def __init__(self, abertura):
-        self.escoamento = 0
+    def __init__(self):
+        self.vazao_agua = 0
 
-    def start(self, abertura):
-        self.escoamento += abertura * 10
-
-    def stop(self):
-        self.escoamento
+    def ajustar_vazao(self, vazao_desejada):
+        self.vazao_agua = vazao_desejada
